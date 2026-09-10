@@ -6,14 +6,19 @@ from typing import Annotated, Literal
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
 from fastapi.responses import JSONResponse
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
+from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 from starlette.responses import Response
 
+from app.api.schemas import IncidentResponse, MonitorCheckRequest, MonitorCheckResponse
 from app.core.config import Settings, get_settings
 from app.core.faults import fault_controller
 from app.db.base import get_session
+from app.db.models import Incident
 from app.db.repository import database_health, record_check, status_summary
+from app.incident.adapters import build_external_client
+from app.incident.service import process_monitor_check
 from app.monitoring.metrics import DATABASE_CHECK_DURATION, READINESS_STATE
 
 router = APIRouter()
@@ -98,6 +103,44 @@ def readiness(session: SessionDependency, settings: SettingsDependency) -> Respo
 @router.get("/metrics", tags=["operations"])
 def metrics() -> Response:
     return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
+
+
+@router.post("/api/checks", response_model=MonitorCheckResponse, tags=["monitoring"])
+def submit_monitor_check(
+    check: MonitorCheckRequest,
+    session: SessionDependency,
+    settings: SettingsDependency,
+) -> MonitorCheckResponse:
+    client = build_external_client(settings)
+    result = process_monitor_check(session, check, settings, client)
+    incident = result.incident
+    return MonitorCheckResponse(
+        check_id=result.check_id,
+        severity=result.severity,
+        incident_action=result.action,
+        incident_id=incident.id if incident else None,
+        external_incident_id=incident.external_incident_id if incident else None,
+        recovery_successes=incident.recovery_successes if incident else 0,
+    )
+
+
+@router.get("/api/incidents", response_model=list[IncidentResponse], tags=["incidents"])
+def list_incidents(
+    session: SessionDependency,
+    incident_status: Annotated[str | None, Query(alias="status")] = None,
+) -> list[Incident]:
+    query = select(Incident).order_by(Incident.detected_at.desc())
+    if incident_status:
+        query = query.where(Incident.status == incident_status.upper())
+    return list(session.scalars(query).all())
+
+
+@router.get("/api/incidents/{incident_id}", response_model=IncidentResponse, tags=["incidents"])
+def get_incident(incident_id: int, session: SessionDependency) -> Incident:
+    incident = session.get(Incident, incident_id)
+    if incident is None:
+        raise HTTPException(status_code=404, detail="incident not found")
+    return incident
 
 
 @router.get("/api/status", tags=["operations"])
