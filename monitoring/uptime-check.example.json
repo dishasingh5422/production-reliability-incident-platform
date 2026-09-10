@@ -1,0 +1,20 @@
+{
+  "displayName": "Production reliability health check",
+  "timeout": "10s",
+  "period": "60s",
+  "monitoredResource": {
+    "type": "uptime_url",
+    "labels": {
+      "host": "SERVICE_HOSTNAME",
+      "project_id": "PROJECT_ID"
+    }
+  },
+  "httpCheck": {
+    "path": "/healthz",
+    "port": 443,
+    "useSsl": true,
+    "validateSsl": true,
+    "requestMethod": "GET"
+  }
+}
+
