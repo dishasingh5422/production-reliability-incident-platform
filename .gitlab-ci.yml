@@ -1,0 +1,48 @@
+stages:
+  - quality
+  - test
+  - build
+
+default:
+  image: python:3.11-slim
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - .cache/pip
+      - .venv/
+  before_script:
+    - python -m venv .venv
+    - .venv/bin/python -m pip install --cache-dir .cache/pip -e '.[dev]'
+
+lint-and-types:
+  stage: quality
+  script:
+    - .venv/bin/ruff check .
+    - .venv/bin/mypy app
+
+security:
+  stage: quality
+  script:
+    - .venv/bin/bandit -q -r app
+
+tests:
+  stage: test
+  script:
+    - .venv/bin/pytest --junitxml=evidence/gitlab-junit.xml --cov=app --cov-report=term --cov-fail-under=80
+  artifacts:
+    when: always
+    reports:
+      junit: evidence/gitlab-junit.xml
+
+container-config:
+  stage: build
+  image: docker:latest
+  before_script: []
+  services:
+    - docker:dind
+  variables:
+    DOCKER_TLS_CERTDIR: "/certs"
+  script:
+    - docker compose config --quiet
+    - docker build --tag "production-reliability-platform:${CI_COMMIT_SHORT_SHA}" .
+
