@@ -154,20 +154,29 @@ function Invoke-ServiceCheck {
         monitor  = $payload
         incident = $incidentResult
     }
-    $output | ConvertTo-Json -Depth 8
-
-    if ($payload.healthy) { return 0 }
-    if ($statusCode -ge 500 -or $null -eq $statusCode) { return 2 }
-    return 1
+    $resolvedExitCode = if ($payload.healthy) {
+        0
+    }
+    elseif ($statusCode -ge 500 -or $null -eq $statusCode) {
+        2
+    }
+    else {
+        1
+    }
+    return [PSCustomObject]@{
+        Json     = ($output | ConvertTo-Json -Depth 8)
+        ExitCode = $resolvedExitCode
+    }
 }
 
 $exitCode = 0
 for ($index = 1; $index -le $PollCount; $index++) {
-    $exitCode = Invoke-ServiceCheck
+    $result = Invoke-ServiceCheck
+    Write-Output $result.Json
+    $exitCode = $result.ExitCode
     if ($index -lt $PollCount) {
         Start-Sleep -Seconds $IntervalSeconds
     }
 }
 
 exit $exitCode
-
