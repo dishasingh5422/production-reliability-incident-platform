@@ -11,6 +11,10 @@ This avoids unnecessary process restart loops during a dependency outage while a
 
 The PowerShell monitor collects DNS resolution, TCP/HTTPS reachability, TLS certificate lifetime, application liveness, database readiness, and response latency. It sends one normalized payload to the application, which assigns severity, stores evidence, and manages incidents.
 
+## Dashboard model
+
+FastAPI serves the dependency-free HTML, CSS, and JavaScript control room at `/dashboard`. The browser calls `/readyz` to create a current readiness observation, then requests the bounded `/api/dashboard` summary. SQL aggregation provides recent checks, incident severity, check pass rate, timed-check latency, MTTR, and deployment evidence. No administrative token or fault-control action is exposed in the interface.
+
 ## Incident model
 
 An SHA-256 key derived from service, check type, and target identifies the active problem. Repeated failures update the open incident. Healthy observations increment a recovery counter; resolution occurs only after the configured threshold.
@@ -29,4 +33,4 @@ GitHub is canonical and GitHub CI is verified. Jenkins is the release pipeline a
 | SQLite default | Fast fresh-clone experience | Ephemeral on Cloud Run |
 | PostgreSQL in Compose | Real SQL dependency and readiness behavior | Requires Docker |
 | Prometheus endpoint | Portable metrics contract | No Geneos implementation |
-
+| Framework-free dashboard | Ships in the same container with no frontend build chain | Intentionally focused on monitoring rather than administration |

@@ -1,11 +1,12 @@
 {
-  "verification_date": "2026-09-11",
-  "verified_source_commit": "75c6244f17b09654510cab7da7434d5dfa8b3e02",
+  "verification_date": "2026-09-12",
+  "application_version": "0.2.0",
+  "verified_source_commit": "f89b686ed11bde6bdd61470f3fbe80ddf31a85f1",
   "tests": {
-    "passed": 16,
+    "passed": 19,
     "failed": 0,
-    "duration_seconds": 0.16,
-    "coverage_percent_exact": 92.83,
+    "duration_seconds": 0.2,
+    "coverage_percent_exact": 93.2384,
     "coverage_percent_display": 93
   },
   "quality_gates": {
@@ -15,14 +16,19 @@
     "python_compile": "passed",
     "docker_compose_config": "passed",
     "linux_container_build": "passed",
-    "container_smoke_test": "passed"
+    "container_smoke_test": "passed",
+    "dashboard_javascript_syntax": "passed",
+    "dashboard_routes_and_assets": "passed"
   },
   "runtime": {
     "api_container": "healthy",
     "postgres_container": "healthy",
     "postgres_image": "postgres:16",
     "powershell_version": "7.4.7",
-    "powershell_execution": "passed in official Linux container"
+    "powershell_execution": "passed in official Linux container",
+    "operations_dashboard": "verified at /dashboard with live PostgreSQL records",
+    "dashboard_data_api": "verified at /api/dashboard",
+    "dashboard_refresh_seconds": 15
   },
   "incident_drill": {
     "incident_id": 2,
@@ -39,14 +45,15 @@
   "github": {
     "repository": "https://github.com/dishasingh5422/production-reliability-incident-platform",
     "ci_status": "passed",
-    "ci_run_id": 34542727350,
-    "ci_run_url": "https://github.com/dishasingh5422/production-reliability-incident-platform/actions/runs/34542727350"
+    "ci_run_id": 34683751235,
+    "ci_run_url": "https://github.com/dishasingh5422/production-reliability-incident-platform/actions/runs/34683751235"
   },
   "integration_status": {
     "github_ci": "verified",
     "powershell": "verified",
     "postgresql": "verified",
     "docker": "verified",
+    "operations_dashboard": "verified locally and in GitHub container build",
     "jenkins_controller": "pending",
     "gitlab_remote": "pending",
     "gcp_cloud_run": "pending",
@@ -56,9 +63,9 @@
   },
   "limitations": [
     "Incident timing is from a controlled same-machine simulation.",
+    "Dashboard check pass rate is synthetic monitoring evidence, not production availability.",
     "The verified external incident reference is produced by the mock adapter.",
     "GCP, ServiceNow, Jenkins-controller and GitLab-remote assets require authenticated runtime validation.",
     "Cloud Run uses ephemeral SQLite unless external persistence is configured."
   ]
 }
-

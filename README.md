@@ -2,9 +2,9 @@
 
 [![CI](https://github.com/dishasingh5422/production-reliability-incident-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/dishasingh5422/production-reliability-incident-platform/actions/workflows/ci.yml)
 
-> A reproducible production-support simulation that detects service degradation, creates one traceable incident, verifies recovery, and turns the failure into an operational improvement.
+> A reproducible production-support simulation with a live operations dashboard that detects service degradation, creates one traceable incident, verifies recovery, and turns the failure into an operational improvement.
 
-**Verified locally:** 16 automated tests · 93% coverage · Docker Compose · PostgreSQL · PowerShell synthetic monitoring · controlled failure and recovery<br>
+**Verified locally:** 19 automated tests · 93% coverage · live operations dashboard · Docker Compose · PostgreSQL · PowerShell synthetic monitoring · controlled failure and recovery<br>
 **Verified remotely:** GitHub CI quality/test and Linux container-build jobs<br>
 **Prepared but not claimed as live:** Jenkins, GitLab mirror, Google Cloud Run/Monitoring, and ServiceNow PDI
 
@@ -14,6 +14,7 @@ This is a portfolio simulation using synthetic operational records. It does not 
 
 | Production-support question | Implemented answer |
 |---|---|
+| What needs attention now? | Auto-refreshing control room with service state, check pass rate, latency, incidents, MTTR, deployment evidence, and filters |
 | Is the process alive? | Dependency-free `GET /healthz` |
 | Can it serve traffic safely? | PostgreSQL-aware `GET /readyz` with safe diagnostic codes |
 | What changed? | Version, environment, deployment-event model, commit-SHA evidence |
@@ -38,6 +39,8 @@ flowchart LR
     PS[PowerShell monitor] --> DNS[DNS and TLS diagnostics]
     PS --> CR
     PS --> API[Check ingestion API]
+    DASH[Operations dashboard] --> API
+    DASH --> DB
     API --> INC[Incident lifecycle]
     INC --> MOCK[Verified mock adapter]
     INC -. optional live .-> SN[ServiceNow PDI]
@@ -48,13 +51,13 @@ flowchart LR
 
 ## Verified findings
 
-The baseline verification performed on 11 September 2026 produced:
+The latest verification performed on 12 September 2026 produced:
 
-- 16 passing automated tests in 0.16 seconds.
-- 92.83% measured branch-aware application coverage, rounded to 93% in summaries.
+- 19 passing automated tests in 0.20 seconds.
+- 93.24% measured branch-aware application coverage, rounded to 93% in summaries.
 - Successful Ruff, strict MyPy, Bandit, Compose validation, Python compilation, and Linux container build.
 - Healthy PostgreSQL and application containers.
-- Successful container smoke test covering health, readiness, metrics, access control, incident deduplication, recovery threshold, and resolution.
+- Successful container smoke test covering the dashboard, dashboard data API, health, readiness, metrics, access control, incident deduplication, recovery threshold, and resolution.
 - A PowerShell monitor result with DNS addresses, HTTP 200, and measured 28.38 ms response time in the healthy baseline.
 - A controlled readiness failure detected by PowerShell as HTTP 503 with critical exit code 2.
 - One high-severity incident created, then resolved after two consecutive healthy checks.
@@ -73,7 +76,7 @@ python -m pip install -e '.[dev]'
 uvicorn app.main:app --host 127.0.0.1 --port 8080
 ```
 
-The API documentation is at `http://127.0.0.1:8080/docs`.
+Open the operations dashboard at `http://127.0.0.1:8080/dashboard`. The interactive API documentation remains available at `http://127.0.0.1:8080/docs`.
 
 ### Docker Compose and PostgreSQL
 
@@ -93,6 +96,8 @@ docker compose down
 
 | Method | Endpoint | Purpose |
 |---|---|---|
+| GET | `/dashboard` | Responsive live operations control room |
+| GET | `/api/dashboard` | Bounded operational summary for the dashboard |
 | GET | `/healthz` | Process liveness without dependency coupling |
 | GET | `/readyz` | Database-backed traffic readiness |
 | GET | `/metrics` | Prometheus-compatible operational metrics |
@@ -103,6 +108,12 @@ docker compose down
 | POST | `/ops/recover` | Remove the controlled fault |
 
 Fault injection is disabled by default. It requires both `ENABLE_FAULT_INJECTION=true` and the `x-admin-token` header.
+
+## Operations dashboard
+
+The dashboard refreshes every 15 seconds and displays the current service state, 24-hour synthetic-check pass rate, average timed-check response, open incidents by severity, average incident MTTR, response-time trend, recent incidents, deployment evidence, and filterable checks. Each refresh records a real readiness observation. It uses no external analytics or chart service and does not expose the local fault-injection token.
+
+The check pass rate is not presented as production availability: it includes controlled monitoring results from the local simulation. See the [dashboard guide](docs/dashboard.md) for metric definitions and demonstration steps.
 
 ## PowerShell monitoring
 
@@ -151,6 +162,7 @@ docker build --tag production-reliability-platform:local .
 ## Operational documentation
 
 - [Architecture and design decisions](docs/architecture.md)
+- [Operations dashboard guide](docs/dashboard.md)
 - [Operations runbook](docs/operations-runbook.md)
 - [Incident management](docs/incident-management.md)
 - [Release and rollback](docs/release-and-rollback.md)
@@ -162,7 +174,7 @@ docker build --tag production-reliability-platform:local .
 ## Repository structure
 
 ```text
-app/                  FastAPI, persistence, metrics, fault and incident logic
+app/                  FastAPI, dashboard, persistence, metrics, fault and incident logic
 database/             PostgreSQL schema and production-support SQL
 tests/                Unit, integration and API contract tests
 scripts/              PowerShell monitor, smoke, deploy, rollback and teardown

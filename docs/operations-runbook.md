@@ -5,9 +5,10 @@
 
 ## 1. Confirm the signal
 
-1. Record alert time, target, check type, response code, latency, and correlation key.
-2. Call `/healthz`, `/readyz`, `/api/status`, and `/api/incidents?status=open`.
-3. Do not restart or roll back until the failure layer is identified.
+1. Open `/dashboard` and record the service state, alert time, target, check type, response code, latency, and incident reference.
+2. Confirm the raw evidence through `/healthz`, `/readyz`, `/api/status`, and `/api/incidents?status=open`.
+3. Use the Attention filter to isolate failed, critical, and warning checks.
+4. Do not restart or roll back until the failure layer is identified.
 
 ## 2. Interpret health and readiness
 
@@ -59,4 +60,3 @@
 - Confirm the same incident resolves rather than duplicates.
 - Record timestamps, root cause, and preventive action.
 - Update a test, alert, or runbook step.
-
