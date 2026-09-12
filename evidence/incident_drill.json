@@ -1,0 +1,31 @@
+{
+  "scenario": "controlled readiness failure",
+  "environment": "local Docker Compose with PostgreSQL and PowerShell container",
+  "fault_activated_at_utc": "2026-09-10T23:33:05.259327Z",
+  "failed_observation_at_utc": "2026-09-10T23:33:06.597481Z",
+  "incident_created_at_utc": "2026-09-10T23:33:06.632276Z",
+  "first_recovery_observation_at_utc": "2026-09-10T23:33:08.085584Z",
+  "second_recovery_observation_at_utc": "2026-09-10T23:33:09.561136Z",
+  "incident_resolved_at_utc": "2026-09-10T23:33:09.592050Z",
+  "monitor": {
+    "check_type": "synthetic-end-to-end",
+    "failed_http_status": 503,
+    "critical_exit_code": 2,
+    "diagnostic": "/readyz returned HTTP 503",
+    "dns_addresses_recorded": true,
+    "healthy_baseline_response_ms": 28.38
+  },
+  "incident": {
+    "id": 2,
+    "external_reference": "MOCK-F9BA6370426C",
+    "severity": "HIGH",
+    "status": "RESOLVED",
+    "recovery_successes": 2
+  },
+  "metrics": {
+    "mttd_seconds_approx": 1.37,
+    "mttr_seconds_approx": 2.96,
+    "mtta": "not measured"
+  },
+  "claim_boundary": "Controlled local simulation only; not production performance or ServiceNow evidence."
+}

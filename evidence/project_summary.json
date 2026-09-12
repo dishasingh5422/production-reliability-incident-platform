@@ -1,0 +1,64 @@
+{
+  "verification_date": "2026-09-11",
+  "verified_source_commit": "75c6244f17b09654510cab7da7434d5dfa8b3e02",
+  "tests": {
+    "passed": 16,
+    "failed": 0,
+    "duration_seconds": 0.16,
+    "coverage_percent_exact": 92.83,
+    "coverage_percent_display": 93
+  },
+  "quality_gates": {
+    "ruff": "passed",
+    "mypy_strict": "passed",
+    "bandit": "passed",
+    "python_compile": "passed",
+    "docker_compose_config": "passed",
+    "linux_container_build": "passed",
+    "container_smoke_test": "passed"
+  },
+  "runtime": {
+    "api_container": "healthy",
+    "postgres_container": "healthy",
+    "postgres_image": "postgres:16",
+    "powershell_version": "7.4.7",
+    "powershell_execution": "passed in official Linux container"
+  },
+  "incident_drill": {
+    "incident_id": 2,
+    "external_reference": "MOCK-F9BA6370426C",
+    "severity": "HIGH",
+    "final_status": "RESOLVED",
+    "failed_http_status": 503,
+    "monitor_exit_code": 2,
+    "recovery_success_threshold": 2,
+    "mttd_seconds_approx": 1.37,
+    "mttr_seconds_approx": 2.96,
+    "production_benchmark": false
+  },
+  "github": {
+    "repository": "https://github.com/dishasingh5422/production-reliability-incident-platform",
+    "ci_status": "passed",
+    "ci_run_id": 34542727350,
+    "ci_run_url": "https://github.com/dishasingh5422/production-reliability-incident-platform/actions/runs/34542727350"
+  },
+  "integration_status": {
+    "github_ci": "verified",
+    "powershell": "verified",
+    "postgresql": "verified",
+    "docker": "verified",
+    "jenkins_controller": "pending",
+    "gitlab_remote": "pending",
+    "gcp_cloud_run": "pending",
+    "gcp_cloud_monitoring": "pending",
+    "servicenow_pdi": "pending",
+    "geneos": "not implemented or claimed"
+  },
+  "limitations": [
+    "Incident timing is from a controlled same-machine simulation.",
+    "The verified external incident reference is produced by the mock adapter.",
+    "GCP, ServiceNow, Jenkins-controller and GitLab-remote assets require authenticated runtime validation.",
+    "Cloud Run uses ephemeral SQLite unless external persistence is configured."
+  ]
+}
+
