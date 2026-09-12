@@ -79,10 +79,10 @@ function renderOverview(data) {
   setText(elements.liveLabel, operational ? "Live" : "Attention");
   setText(elements.environment, data.environment);
 
-  setText(elements.availability, formatNumber(data.availability_percent, "%"));
+  setText(elements.availability, formatNumber(data.check_pass_rate_percent, "%"));
   setText(
     elements.availabilityNote,
-    data.availability_percent === null ? "No qualifying checks in this window" : `${data.window_hours}-hour monitored window`,
+    data.check_pass_rate_percent === null ? "No qualifying checks in this window" : `${data.window_hours}-hour synthetic-check window`,
   );
   setText(elements.latency, data.average_response_ms === null ? "—" : `${formatNumber(data.average_response_ms)} ms`);
   setText(elements.incidentValue, String(data.open_incidents));

@@ -16,6 +16,7 @@ json_post() {
 
 curl --silent --show-error --fail "$BASE_URL/healthz" | jq -e '.status == "healthy"' >/dev/null
 curl --silent --show-error --fail "$BASE_URL/readyz" | jq -e '.status == "ready"' >/dev/null
+curl --silent --show-error --fail "$BASE_URL/dashboard" | grep -q 'Reliability Control Room'
 curl --silent --show-error --fail "$BASE_URL/metrics" | grep -q 'reliability_build_info'
 
 failure_payload="{\"service_name\":\"production-reliability-platform\",\"check_type\":\"smoke-test\",\"target\":\"$BASE_URL\",\"healthy\":false,\"status_code\":503,\"diagnostic_summary\":\"controlled smoke-test failure\"}"
@@ -48,6 +49,7 @@ curl --silent --show-error --fail \
   --header "x-admin-token: $ADMIN_TOKEN" \
   "$BASE_URL/ops/recover" >/dev/null
 curl --silent --show-error --fail "$BASE_URL/readyz" | jq -e '.status == "ready"' >/dev/null
+curl --silent --show-error --fail "$BASE_URL/api/dashboard" |
+  jq -e '.state == "operational" and (.recent_checks | length > 0)' >/dev/null
 
-printf 'Smoke test passed: service, monitoring, incident deduplication, recovery, and access controls.\n'
-
+printf 'Smoke test passed: dashboard, monitoring, incident deduplication, recovery, and access controls.\n'

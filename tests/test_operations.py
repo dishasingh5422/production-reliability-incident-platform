@@ -47,7 +47,7 @@ def test_dashboard_data_summarises_operational_checks(client: TestClient) -> Non
     payload = dashboard.json()
     assert payload["state"] == "operational"
     assert payload["environment"] == "test"
-    assert payload["availability_percent"] == 100.0
+    assert payload["check_pass_rate_percent"] == 100.0
     assert payload["open_incidents"] == 0
     assert payload["open_incidents_by_severity"] == {"HIGH": 0, "MEDIUM": 0, "LOW": 0}
     assert payload["recent_checks"][0]["check_type"] == "database-readiness"

@@ -127,7 +127,7 @@ def dashboard_summary(session: Session) -> dict[str, Any]:
     return {
         "generated_at": now,
         "window_hours": 24,
-        "availability_percent": (
+        "check_pass_rate_percent": (
             round(len(healthy_checks) / len(availability_checks) * 100, 2)
             if availability_checks
             else None
