@@ -1,6 +1,25 @@
 from fastapi.testclient import TestClient
 
 
+def test_root_redirects_to_dashboard(client: TestClient) -> None:
+    response = client.get("/", follow_redirects=False)
+
+    assert response.status_code == 307
+    assert response.headers["location"] == "/dashboard"
+
+
+def test_dashboard_page_and_assets_are_served(client: TestClient) -> None:
+    page = client.get("/dashboard")
+    stylesheet = client.get("/dashboard-assets/styles.css")
+    script = client.get("/dashboard-assets/dashboard.js")
+
+    assert page.status_code == 200
+    assert "Reliability Control Room" in page.text
+    assert "/api/dashboard" in script.text
+    assert stylesheet.status_code == 200
+    assert script.status_code == 200
+
+
 def test_health_contract(client: TestClient) -> None:
     response = client.get("/healthz")
 
@@ -18,6 +37,20 @@ def test_readiness_records_database_check(client: TestClient) -> None:
     assert response.json()["database"] == "available"
     assert status.json()["last_check"]["type"] == "database-readiness"
     assert status.json()["last_check"]["status"] == "HEALTHY"
+
+
+def test_dashboard_data_summarises_operational_checks(client: TestClient) -> None:
+    client.get("/readyz")
+    dashboard = client.get("/api/dashboard")
+
+    assert dashboard.status_code == 200
+    payload = dashboard.json()
+    assert payload["state"] == "operational"
+    assert payload["environment"] == "test"
+    assert payload["availability_percent"] == 100.0
+    assert payload["open_incidents"] == 0
+    assert payload["open_incidents_by_severity"] == {"HIGH": 0, "MEDIUM": 0, "LOW": 0}
+    assert payload["recent_checks"][0]["check_type"] == "database-readiness"
 
 
 def test_metrics_expose_required_series(client: TestClient) -> None:

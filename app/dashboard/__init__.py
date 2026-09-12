@@ -1,0 +1,1 @@
+"""Static operations dashboard assets."""

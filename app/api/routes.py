@@ -16,7 +16,7 @@ from app.core.config import Settings, get_settings
 from app.core.faults import fault_controller
 from app.db.base import get_session
 from app.db.models import Incident
-from app.db.repository import database_health, record_check, status_summary
+from app.db.repository import dashboard_summary, database_health, record_check, status_summary
 from app.incident.adapters import build_external_client
 from app.incident.service import process_monitor_check
 from app.monitoring.metrics import DATABASE_CHECK_DURATION, READINESS_STATE
@@ -160,6 +160,22 @@ def application_status(
         "state": "operational" if fault.mode is None else "degraded",
         "fault_mode": fault.mode,
         **status_summary(session),
+    }
+
+
+@router.get("/api/dashboard", tags=["operations"])
+def dashboard_data(
+    session: SessionDependency,
+    settings: SettingsDependency,
+) -> dict[str, object]:
+    fault = fault_controller.snapshot()
+    return {
+        "service": settings.app_name,
+        "version": settings.app_version,
+        "environment": settings.app_env,
+        "state": "operational" if fault.mode is None else "degraded",
+        "fault_mode": fault.mode,
+        **dashboard_summary(session),
     }
 
 

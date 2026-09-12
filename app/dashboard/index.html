@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Live operational dashboard for the Production Reliability and Incident Automation Platform">
+    <title>Reliability Control Room</title>
+    <link rel="stylesheet" href="/dashboard-assets/styles.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to dashboard</a>
+    <div class="shell">
+      <aside class="sidebar" aria-label="Primary navigation">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+          <div>
+            <strong>Reliability</strong>
+            <small>Control room</small>
+          </div>
+        </div>
+
+        <nav class="nav-list">
+          <a class="nav-item active" href="#overview" aria-current="page">
+            <span class="nav-icon">01</span><span>Overview</span>
+          </a>
+          <a class="nav-item" href="#incidents">
+            <span class="nav-icon">02</span><span>Incidents</span>
+          </a>
+          <a class="nav-item" href="#checks">
+            <span class="nav-icon">03</span><span>Checks</span>
+          </a>
+          <a class="nav-item" href="/docs" target="_blank" rel="noreferrer">
+            <span class="nav-icon">↗</span><span>API console</span>
+          </a>
+        </nav>
+
+        <div class="sidebar-foot">
+          <span class="environment-dot" aria-hidden="true"></span>
+          <div>
+            <small>Environment</small>
+            <strong id="sidebar-environment">Connecting</strong>
+          </div>
+        </div>
+      </aside>
+
+      <main id="main-content" class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Production operations</p>
+            <h1>Service overview</h1>
+          </div>
+          <div class="topbar-actions">
+            <span id="last-updated" class="last-updated">Waiting for live data</span>
+            <button id="refresh-button" class="refresh-button" type="button">
+              <span class="refresh-glyph" aria-hidden="true">↻</span>
+              Refresh
+            </button>
+          </div>
+        </header>
+
+        <div id="connection-banner" class="connection-banner" role="status" hidden>
+          <strong>Live data temporarily unavailable.</strong>
+          <span>The dashboard will retry automatically.</span>
+        </div>
+
+        <section id="overview" class="status-hero" aria-labelledby="service-heading">
+          <div class="status-main">
+            <div id="service-state-icon" class="state-icon" aria-hidden="true"><span></span></div>
+            <div>
+              <p class="eyebrow">Current service state</p>
+              <h2 id="service-heading">Connecting to service</h2>
+              <p id="service-detail" class="service-detail">Loading environment and readiness evidence…</p>
+            </div>
+          </div>
+          <div class="live-indicator">
+            <span class="pulse" aria-hidden="true"></span>
+            <span id="live-label">Live</span>
+          </div>
+        </section>
+
+        <section class="metric-grid" aria-label="Key reliability metrics">
+          <article class="metric-card accent-green">
+            <div class="metric-head"><span>24h availability</span><span class="metric-symbol">UP</span></div>
+            <strong id="availability-value" class="metric-value">—</strong>
+            <p id="availability-note">Awaiting monitored checks</p>
+          </article>
+          <article class="metric-card accent-blue">
+            <div class="metric-head"><span>Average response</span><span class="metric-symbol">MS</span></div>
+            <strong id="latency-value" class="metric-value">—</strong>
+            <p>Across recent timed checks</p>
+          </article>
+          <article class="metric-card accent-red">
+            <div class="metric-head"><span>Open incidents</span><span class="metric-symbol">INC</span></div>
+            <strong id="incident-value" class="metric-value">—</strong>
+            <p id="incident-note">No severity data yet</p>
+          </article>
+          <article class="metric-card accent-amber">
+            <div class="metric-head"><span>Average MTTR</span><span class="metric-symbol">MTTR</span></div>
+            <strong id="mttr-value" class="metric-value">—</strong>
+            <p>Detection to verified resolution</p>
+          </article>
+        </section>
+
+        <section class="dashboard-grid">
+          <article class="panel latency-panel">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">Performance signal</p>
+                <h2>Response time</h2>
+              </div>
+              <div class="legend"><span></span>Recent checks</div>
+            </div>
+            <div id="latency-chart" class="chart" role="img" aria-label="Response time chart">
+              <div class="chart-empty">Response-time observations will appear here.</div>
+            </div>
+          </article>
+
+          <article class="panel release-panel">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">Change control</p>
+                <h2>Latest deployment</h2>
+              </div>
+              <span id="deployment-status" class="badge neutral">No record</span>
+            </div>
+            <dl class="release-details">
+              <div><dt>Version</dt><dd id="deployment-version">—</dd></div>
+              <div><dt>Environment</dt><dd id="deployment-environment">—</dd></div>
+              <div><dt>Commit</dt><dd id="deployment-commit">—</dd></div>
+              <div><dt>Started</dt><dd id="deployment-time">—</dd></div>
+            </dl>
+            <div class="quality-strip" aria-label="Automated quality evidence">
+              <div><strong>19</strong><span>Tests</span></div>
+              <div><strong>93%</strong><span>Coverage</span></div>
+              <div><strong>Green</strong><span>Previous CI</span></div>
+            </div>
+          </article>
+        </section>
+
+        <section id="incidents" class="panel incident-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Incident management</p>
+              <h2>Recent incidents</h2>
+            </div>
+            <span id="incident-summary" class="panel-meta">Loading</span>
+          </div>
+          <div id="incident-list" class="incident-list" aria-live="polite">
+            <div class="empty-state"><span>✓</span><strong>Loading incident history</strong></div>
+          </div>
+        </section>
+
+        <section id="checks" class="panel checks-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Monitoring evidence</p>
+              <h2>Recent checks</h2>
+            </div>
+            <div class="filter-group" role="group" aria-label="Filter monitoring checks">
+              <button class="filter-chip active" data-filter="all" type="button">All</button>
+              <button class="filter-chip" data-filter="failed" type="button">Attention</button>
+              <button class="filter-chip" data-filter="healthy" type="button">Healthy</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Status</th><th>Check</th><th>Target</th><th>Response</th><th>HTTP</th><th>Observed</th></tr></thead>
+              <tbody id="checks-body"><tr><td colspan="6" class="table-empty">Loading monitoring evidence…</td></tr></tbody>
+            </table>
+          </div>
+        </section>
+
+        <footer>
+          <span>Production Reliability &amp; Incident Automation Platform</span>
+          <span>Synthetic portfolio environment · no bank or customer data</span>
+        </footer>
+      </main>
+    </div>
+    <script src="/dashboard-assets/dashboard.js" defer></script>
+  </body>
+</html>

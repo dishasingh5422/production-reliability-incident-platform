@@ -3,8 +3,11 @@ import time
 import uuid
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI, Request
+from fastapi.responses import FileResponse, RedirectResponse
+from fastapi.staticfiles import StaticFiles
 from starlette.middleware.base import RequestResponseEndpoint
 from starlette.responses import Response
 
@@ -37,6 +40,13 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+dashboard_directory = Path(__file__).parent / "dashboard"
+app.mount(
+    "/dashboard-assets",
+    StaticFiles(directory=dashboard_directory),
+    name="dashboard-assets",
+)
+
 
 @app.middleware("http")
 async def operational_metrics(request: Request, call_next: RequestResponseEndpoint) -> Response:
@@ -59,3 +69,13 @@ async def operational_metrics(request: Request, call_next: RequestResponseEndpoi
 
 
 app.include_router(router)
+
+
+@app.get("/", include_in_schema=False)
+def index() -> RedirectResponse:
+    return RedirectResponse(url="/dashboard", status_code=307)
+
+
+@app.get("/dashboard", include_in_schema=False)
+def dashboard() -> FileResponse:
+    return FileResponse(dashboard_directory / "index.html")

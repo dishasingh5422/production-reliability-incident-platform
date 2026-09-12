@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "production-reliability-incident-platform"
-version = "0.1.0"
+version = "0.2.0"
 description = "Production support, monitoring, incident automation, and recovery simulation"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -31,6 +31,9 @@ dev = [
 
 [tool.setuptools.packages.find]
 include = ["app*"]
+
+[tool.setuptools.package-data]
+app = ["dashboard/*.html", "dashboard/*.css", "dashboard/*.js"]
 
 [tool.pytest.ini_options]
 addopts = "-q --strict-markers --disable-warnings"
@@ -59,4 +62,3 @@ plugins = ["pydantic.mypy"]
 
 [tool.bandit]
 exclude_dirs = ["tests", ".venv"]
-
